@@ -41,17 +41,11 @@ function calculator(expression) {
           (operand1 = operandStack.pop()) &&
           (operand2 = operandStack.pop())
         ) {
-          //console.log("value === )");
-          //console.log("operands", [operand1, operand2]);
-          //console.log("operation", operation);
           const res = execOperation(operation, operand2, operand1);
 
-          //console.log(res);
           operandStack.push(res);
-          //console.log(operandStack);
         }
       } else if (value === "(") {
-        //console.log("value === (");
         operationStack.push(value);
       } else {
         while (
@@ -63,9 +57,7 @@ function calculator(expression) {
           let operation = operationStack.pop();
           let operand1 = operandStack.pop();
           let operand2 = operandStack.pop();
-          //console.log("value !== ()");
-          //console.log("operands", [operand1, operand2]);
-          //console.log("operation", operation);
+
           const res = execOperation(operation, operand2, operand1);
 
           operandStack.push(res);
@@ -74,8 +66,6 @@ function calculator(expression) {
         operationStack.push(value);
       }
     }
-    //console.log("operandStack", operandStack);
-    //console.log("operationsStack", operationStack);
   }
 
   return operandStack[0];
@@ -117,7 +107,6 @@ function execOperation(operation, operand1, operand2) {
   switch (operation) {
     case "+": {
       res = operand1 + operand2;
-      //console.log("here plus");
       break;
     }
     case "*": {
@@ -125,7 +114,6 @@ function execOperation(operation, operand1, operand2) {
       break;
     }
     case "-": {
-      //console.log("here minus");
       res = operand1 - operand2;
       break;
     }

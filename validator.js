@@ -75,8 +75,6 @@ function validator(expression, isExpr = false, pos = 0) {
       }
     }
 
-    //console.log(symbols);
-
     if (
       symbols.at(-1) &&
       exprCycle[(symbols.length - 1) % (exprCycle.length - 1)] !==
