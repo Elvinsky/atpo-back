@@ -13,6 +13,7 @@ const RAPID_HOST = process.env.RAPID_API_HOST
 
 const clearModule = (code) => {
   const regex = /(import|export).*?;|console.log\(.*?;|\/\/.*?;|\/\*.*\*\//g;
+
   return code.replaceAll(regex, "");
 };
 
@@ -47,6 +48,7 @@ async function init() {
 
   app.post("/submit", async (req, res) => {
     const expr = req.body.code;
+
     const code = await getPlainCalculatorCode(expr);
 
     const result = await axios.post(
@@ -63,6 +65,7 @@ async function init() {
       }
     );
     console.log(result.data);
+
     res.status(200);
     res.send(result.data);
   });
@@ -77,8 +80,11 @@ async function init() {
 
   app.post("/code", async (req, res) => {
     const { code, name } = req.body;
+
     await codeCollection.insertOne({ code, name, createdOn: new Date() });
+
     console.log(`created Code: {${code}, ${name}}`);
+
     res.status(201);
     res.send("created");
   });

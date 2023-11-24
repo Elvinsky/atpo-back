@@ -26,22 +26,27 @@ function validator(expression, isExpr = false, pos = 0) {
         posEnd: newIndex,
         type: "expression",
       });
+
       i = newIndex;
     } else {
       if (allowedSymbols.includes(value)) {
         let newPos = i;
         let newSymbols = [];
+
         if (value === "(") {
           [newPos, newSymbols] = validator(expression, true, i + 1);
+
           if (newSymbols.length === 0) {
             throw new Error("parenthesis cannot be empty");
           }
+
           symbols.push({
             value: newSymbols,
             posStart: i,
             posEnd: newPos,
             type: "expression",
           });
+
           i = newPos;
         } else if (value === ")") {
           if (!isExpr) {
@@ -87,6 +92,7 @@ function validator(expression, isExpr = false, pos = 0) {
 
     if (symbols.length === 3) {
       let prevValues = symbols.slice();
+
       symbols = [];
       symbols.push({
         value: prevValues,
@@ -108,6 +114,7 @@ function validator(expression, isExpr = false, pos = 0) {
 
 function parseNumber(expression, index) {
   let value = expression[index];
+
   if (!Number.isNaN(Number(value))) {
     let i = index;
     let count = 1;
@@ -117,7 +124,9 @@ function parseNumber(expression, index) {
       expression[i + 1] !== " "
     ) {
       count *= 10;
+
       i++;
+
       number = number * count + Number(expression[i]);
     }
     return [number, i];

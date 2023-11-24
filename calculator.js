@@ -15,8 +15,10 @@ function calculator(expression) {
   if (!expression.endsWith(";")) {
     expression = `${expression};`;
   }
+
   const operandStack = [];
   const operationStack = [];
+
   for (let i = 0; i < expression.length; i++) {
     const value = expression[i];
 
@@ -36,6 +38,7 @@ function calculator(expression) {
     } else {
       if (value === ")") {
         let operation, operand1, operand2;
+
         while (
           (operation = operationStack.pop()) !== "(" &&
           (operand1 = operandStack.pop()) &&
@@ -73,18 +76,23 @@ function calculator(expression) {
 
 function parseNumber(expression, index) {
   let value = expression[index];
+
   if (!Number.isNaN(Number(value))) {
     let i = index;
     let count = 1;
     let number = Number(value);
+
     while (
       !Number.isNaN(Number(expression[i + 1])) &&
       expression[i + 1] !== " "
     ) {
       count *= 10;
+
       i++;
+
       number = number * count + Number(expression[i]);
     }
+
     return [number, i];
   }
 
@@ -96,6 +104,7 @@ function parseNumber(expression, index) {
         !Number.isNaN(Number(expression[index + 1]))))
   ) {
     const sign = value === "-" ? -1 : 1;
+
     return [sign, index, true];
   }
 
@@ -104,6 +113,7 @@ function parseNumber(expression, index) {
 
 function execOperation(operation, operand1, operand2) {
   let res;
+
   switch (operation) {
     case "+": {
       res = operand1 + operand2;
