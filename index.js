@@ -7,6 +7,10 @@ import cors from "cors";
 import axios from "axios";
 import { MongoClient } from "mongodb";
 
+const MONGO_URI = process.env.MONGO_URI
+const RAPID_KEY = process.env.RAPID_API_KEY
+const RAPID_HOST = process.env.RAPID_API_HOST
+
 const clearModule = (code) => {
   const regex = /(import|export).*?;|console.log\(.*?;|\/\/.*?;|\/\*.*\*\//g;
   return code.replaceAll(regex, "");
@@ -31,9 +35,7 @@ const getPlainCalculatorCode = async (code) => {
 };
 
 async function init() {
-  const client = new MongoClient(
-    "mongodb+srv://isavitskiy8:ColnishkoMongo@cluster0.vajawtj.mongodb.net/"
-  );
+  const client = new MongoClient(MONGO_URI);
   const database = client.db("sample_mflix");
   const codeCollection = database.collection("code");
 
@@ -48,16 +50,15 @@ async function init() {
     const code = await getPlainCalculatorCode(expr);
 
     const result = await axios.post(
-      "https://judge0-ce.p.rapidapi.com/submissions/?wait=true",
+      `https://${RAPID_HOST}/submissions/?wait=true`,
       {
         source_code: code,
         language_id: 93,
       },
       {
         headers: {
-          "X-RapidAPI-Key":
-            "b9565413aamsh5efbf11e95fe176p1d30a9jsn2988781db135",
-          "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+          "X-RapidAPI-Key": RAPID_KEY,
+          "X-RapidAPI-Host": RAPID_HOST,
         },
       }
     );
