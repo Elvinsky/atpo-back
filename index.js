@@ -6,6 +6,9 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import axios from "axios";
 import { MongoClient } from "mongodb";
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const MONGO_URI = process.env.MONGO_URI
 const RAPID_KEY = process.env.RAPID_API_KEY
@@ -64,6 +67,7 @@ async function init() {
         },
       }
     );
+
     console.log(result.data);
 
     res.status(200);
@@ -72,6 +76,7 @@ async function init() {
 
   app.get("/code", async (req, res) => {
     const result = await codeCollection.find({}).toArray();
+
     console.log(result);
 
     res.status(200);
