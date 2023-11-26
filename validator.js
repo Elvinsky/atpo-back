@@ -37,7 +37,7 @@ function validator(expression, isExpr = false, pos = 0) {
           [newPos, newSymbols] = validator(expression, true, i + 1);
 
           if (newSymbols.length === 0) {
-            throw new Error("parenthesis cannot be empty");
+            throw new Error("Parenthesis cannot be empty");
           }
 
           symbols.push({
@@ -51,7 +51,7 @@ function validator(expression, isExpr = false, pos = 0) {
         } else if (value === ")") {
           if (!isExpr) {
             throw new Error(
-              "closing parenthesis dont have opening corresponding one"
+              "Closed parenthesis doesn't have opened corresponding one"
             );
           }
 
@@ -63,7 +63,7 @@ function validator(expression, isExpr = false, pos = 0) {
             symbols.length % 3 !== 0 &&
             !(symbols.length === 1 && symbols[0].type === "expression")
           ) {
-            throw new Error("expression in parenthesis are not valid");
+            throw new Error("Expression in parenthesis are not valid");
           }
 
           return [i, symbols];
@@ -76,7 +76,7 @@ function validator(expression, isExpr = false, pos = 0) {
           });
         }
       } else {
-        throw new Error(`invalid character in expression ${expression[i]}`);
+        throw new Error(`Invalid character in expression ${expression[i]}`);
       }
     }
 
@@ -86,7 +86,7 @@ function validator(expression, isExpr = false, pos = 0) {
         symbols.at(-1).type
     ) {
       throw new Error(
-        `error at expression's cycle. Unexpected ${symbols.at(-1).value}`
+        `Error at expression's cycle. Unexpected ${symbols.at(-1).value}`
       );
     }
 
@@ -102,11 +102,11 @@ function validator(expression, isExpr = false, pos = 0) {
   }
 
   if (isExpr) {
-    throw new Error("Open par");
+    throw new Error("Opened parenthesis doesn't have closed corresponding one");
   }
 
   if (symbols.length !== 1 || symbols.at(-1).type !== "expression") {
-    throw new Error("after operation there should be expression");
+    throw new Error("After operation there should be expression");
   }
 
   return [expression.length - 1, symbols];
