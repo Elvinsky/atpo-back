@@ -95,11 +95,13 @@ async function init() {
     res.send("created");
   });
 
-  app.put("/code", async (req, res) => {
-    const { code, name, id } = req.body;
+  app.put("/code/:id", async (req, res) => {
+    const { code, name } = req.body;
+
+    const _id = new ObjectId(req.params.id)
 
     const result = await codeCollection.updateOne(
-      { _id: new ObjectId(id) }, 
+      { _id }, 
       { $set: { code, name } },
     );
 
@@ -109,6 +111,17 @@ async function init() {
 
     res.status(200);
     res.send(result);
+  });
+
+  app.delete("/code/:id", async (req, res) => {
+    const _id = new ObjectId(req.params.id)
+
+    await codeCollection.deleteOne({ _id });
+
+    console.log(`Deleted Code with id: ${req.params.id}`);
+
+    res.status(200);
+    res.send('deleted');
   });
 
   app.listen(8000);
