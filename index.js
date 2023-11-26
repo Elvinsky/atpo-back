@@ -7,6 +7,7 @@ import cors from "cors";
 import axios from "axios";
 import { MongoClient } from "mongodb";
 import dotenv from 'dotenv'
+import { ObjectId } from "mongodb";
 
 dotenv.config()
 
@@ -92,6 +93,22 @@ async function init() {
 
     res.status(201);
     res.send("created");
+  });
+
+  app.put("/code", async (req, res) => {
+    const { code, name, id } = req.body;
+
+    const result = await codeCollection.updateOne(
+      { _id: new ObjectId(id) }, 
+      { $set: { code, name } },
+    );
+
+    console.log(result)
+
+    console.log(`Updated Code: {${code}, ${name}}`);
+
+    res.status(200);
+    res.send(result);
   });
 
   app.listen(8000);
