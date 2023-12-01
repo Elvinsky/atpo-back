@@ -1,5 +1,4 @@
 const allowedSymbols = "+-*/();";
-const allowedRepeat = "()";
 
 const exprCycle = ["expression", "operation", "expression"];
 

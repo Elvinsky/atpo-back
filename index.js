@@ -9,6 +9,8 @@ import { MongoClient } from "mongodb";
 import dotenv from 'dotenv'
 import { ObjectId } from "mongodb";
 
+import { flattenString } from "./utils/index.js";
+
 dotenv.config()
 
 const MONGO_URI = process.env.MONGO_URI
@@ -33,9 +35,10 @@ const getPlainCalculatorCode = async (code) => {
 
   const validatorClean = clearModule(validator);
   const calculatorClean = clearModule(calculator);
+  const flattenedCode = flattenString(code)
 
   return (
-    validatorClean + calculatorClean + `\nconsole.log(calculator("${code}"));`
+    validatorClean + calculatorClean + `\nconsole.log(calculator("${flattenedCode}"));`
   );
 };
 

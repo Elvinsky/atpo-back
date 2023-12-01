@@ -1,0 +1,1 @@
+export const flattenString = (value) => value.replace(/\s+/g, '');
