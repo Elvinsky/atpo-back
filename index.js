@@ -9,7 +9,7 @@ import { MongoClient } from "mongodb";
 import dotenv from 'dotenv'
 import { ObjectId } from "mongodb";
 
-import { flattenString } from "./utils/index.js";
+import { flattenString, replaceVariables } from "./utils/index.js";
 
 dotenv.config()
 
@@ -35,10 +35,10 @@ const getPlainCalculatorCode = async (code) => {
 
   const validatorClean = clearModule(validator);
   const calculatorClean = clearModule(calculator);
-  const flattenedCode = flattenString(code)
+  const filteredExpression = replaceVariables(code);
 
   return (
-    validatorClean + calculatorClean + `\nconsole.log(calculator("${flattenedCode}"));`
+    validatorClean + calculatorClean + `\nconsole.log(calculator("${filteredExpression}"));`
   );
 };
 
@@ -56,32 +56,34 @@ async function init() {
   app.post("/submit", async (req, res) => {
     const expr = req.body.code;
 
-    const code = await getPlainCalculatorCode(expr);
-
-    const result = await axios.post(
-      `https://${RAPID_HOST}/submissions/?wait=true`,
-      {
-        source_code: code,
-        language_id: 93,
-      },
-      {
-        headers: {
-          "X-RapidAPI-Key": RAPID_KEY,
-          "X-RapidAPI-Host": RAPID_HOST,
+    try {
+      const code = await getPlainCalculatorCode(expr);
+  
+      const result = await axios.post(
+        `https://${RAPID_HOST}/submissions/?wait=true`,
+        {
+          source_code: code,
+          language_id: 93,
         },
-      }
-    );
-
-    console.log(result.data);
-
-    res.status(200);
-    res.send(result.data);
+        {
+          headers: {
+            "X-RapidAPI-Key": RAPID_KEY,
+            "X-RapidAPI-Host": RAPID_HOST,
+          },
+        }
+      );
+  
+      res.status(200);
+      res.send(result.data);
+    } catch (error) {
+      res
+        .status(200)
+        .json({ stderr: error.message })
+    }
   });
 
   app.get("/code", async (req, res) => {
     const result = await codeCollection.find({}).toArray();
-
-    console.log(result);
 
     res.status(200);
     res.send(result);

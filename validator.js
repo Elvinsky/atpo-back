@@ -54,10 +54,6 @@ function validator(expression, isExpr = false, pos = 0) {
             );
           }
 
-          // if (symbols.at(-1).type == "operation") {
-          //   throw new Error("operation dont have second operand");
-          // }
-
           if (
             symbols.length % 3 !== 0 &&
             !(symbols.length === 1 && symbols[0].type === "expression")
