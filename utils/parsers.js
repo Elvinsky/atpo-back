@@ -2,8 +2,8 @@ import calculator from "../calculator.js";
 
 const possibleDeclarations = ["let", "const"];
 
-export function replaceVariables(code) {
-  let variables = {};
+export function replaceVariables(code, variables) {
+  let localVariables = variables || {};
 
   let lines = code.split("\n");
 
@@ -20,38 +20,44 @@ export function replaceVariables(code) {
       const splittedExpression = expression.split(',');
 
       for (let i = 0; i < splittedExpression.length; i++) {
-        const expressionVariables = parseVariableExpression(splittedExpression[i].trim(), declaration, variables);
+        const expressionVariables = parseVariableExpression(splittedExpression[i].trim(), declaration, localVariables);
 
-        variables = {
-          ...variables,
+        localVariables = {
+          ...localVariables,
           ...expressionVariables,
-        }
+        };
       }
     } else if (line.indexOf('=') > -1) {
-      const [name, sign, value] = line.split(" ");
+      let [variable, value] = expression.trim().split(/(?<!=)=(?!=)/g);
+
+      variable = variable.trim();
+
+      if (value) {
+        const expressionRegex = new RegExp(/^[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*[^=]+$/gm);
       
-      if (!possibleDeclarations.includes(name) && !variables.hasOwnProperty(name)) {
-        throw new SyntaxError(`Unexpected variable declaration '${name}'.`);
+        if (!expressionRegex.test(expression)) {
+          throw new SyntaxError(`Invalid variable assignment syntax: ${expression}`);
+        }
       }
       
-      if (!variables.hasOwnProperty(name)) {
-        throw new ReferenceError(`Variable ${name} is not defined.`);
+      if (!possibleDeclarations.includes(variable) && !localVariables.hasOwnProperty(variable)) {
+        throw new SyntaxError(`Unexpected variable declaration '${variable}'.`);
+      }
+      
+      if (!localVariables.hasOwnProperty(variable)) {
+        throw new ReferenceError(`Variable ${variable} is not defined.`);
       }
 
-      if (sign !== '=') {
-        throw new SyntaxError(`Unexpected token '${sign}'.`);
-      }
-
-      if (variables[name].declaration === "const") {
-        throw new TypeError(`Assignment to constant variable ${name}.`);
+      if (localVariables[variable].declaration === "const") {
+        throw new TypeError(`Assignment to constant variable ${variable}.`);
       } else {
-        variables[name].value = value;
+        localVariables[variable].value = value;
       }
     } else {
-      for (let name in variables) {
-        const value = variables[name].value;
+      for (let variable in localVariables) {
+        const value = localVariables[variable].value;
 
-        const regex = new RegExp(`\\b${name}\\b`, "g");
+        const regex = new RegExp(`\\b${variable}\\b`, "g");
 
         line = line.replace(regex, value);
       }
@@ -68,18 +74,22 @@ const parseVariableExpression = (expression, declaration, variables) => {
 
   variable = variable.trim();
 
-  if (value) {
-    const expressionRegex = new RegExp(/^[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*[^=]+$/g);
-  
-    if (!expressionRegex.test(expression)) {
-      throw new SyntaxError(`Invalid variable assignment syntax: ${expression}`);
-    }
+  if (!variable) {
+    throw new SyntaxError("Variable name can't be empty.")
   }
 
   const variableRegex = new RegExp(/^([a-zA-Z_$][a-zA-Z\d_$]*)$/g);
 
-  if (value && !variableRegex.test(variable)) {
+  if (!variableRegex.test(variable)) {
     throw new SyntaxError(`Invalid variable name: ${variable}.`);
+  }
+
+  if (value) {
+    const expressionRegex = new RegExp(/^[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*[^=]+$/gm);
+  
+    if (!expressionRegex.test(expression)) {
+      throw new SyntaxError(`Invalid variable assignment syntax: ${expression}`);
+    }
   }
 
   if (declaration === 'const') {
@@ -89,6 +99,12 @@ const parseVariableExpression = (expression, declaration, variables) => {
 
     if (variables.hasOwnProperty(variable)) {
       throw new TypeError(`Assignment to constant variable ${variable}.`);
+    }
+
+    const stringFirstCharRegex = new RegExp(/^[a-zA-Z]/gm)
+
+    if (stringFirstCharRegex.test(value.trim())) {
+      value = replaceVariables(value, variables);
     }
 
     expressionVariables[variable] = { declaration, value: calculator(value.trim()) };
@@ -101,6 +117,12 @@ const parseVariableExpression = (expression, declaration, variables) => {
 
     if (variables.hasOwnProperty(variable)) {
       throw new SyntaxError(`Identifier '${variable}' has already been declared.`);
+    }
+
+    const stringFirstCharRegex = new RegExp(/^[a-zA-Z]/gm)
+
+    if (stringFirstCharRegex.test(value.trim())) {
+      value = replaceVariables(value, variables);
     }
 
     expressionVariables[variable] = { declaration, value: calculator(value.trim()) };
